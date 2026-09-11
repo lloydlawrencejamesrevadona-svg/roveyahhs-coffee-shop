@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roveyahh's Coffee Shop</title>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --espresso: #2b1a12;
+    --coffee: #4a2c1a;
+    --latte: #c8a27a;
+    --cream: #f5ede1;
+    --foam: #fffaf3;
+    --accent: #d4a373;
+    --gold: #b8860b;
+    --bg: #fffaf3;
+    --bg-soft: #f5ede1;
+    --bg-dark: #2b1a12;
+    --text: #2b1a12;
+    --text-soft: #5a4232;
+    --text-muted: #8a7563;
+    --card: #fffaf3;
+    --border: rgba(200, 162, 122, 0.3);
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1008;
+    --bg-soft: #241610;
+    --bg-dark: #0f0805;
+    --text: #f5ede1;
+    --text-soft: #c8a27a;
+    --text-muted: #a08a72;
+    --card: #241610;
+    --border: rgba(212, 163, 115, 0.25);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Georgia', serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(43, 26, 18, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 1rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+  }
+  .logo { color: var(--cream); font-size: 1.4rem; font-weight: bold; letter-spacing: 1px; }
+  .logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  nav ul { display: flex; list-style: none; gap: 2rem; }
+  nav a { color: var(--cream); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; letter-spacing: 0.5px; }
+  nav a:hover { color: var(--accent); }
+
+  .lang-switch { display: flex; gap: 2px; background: rgba(200, 162, 122, 0.15); border-radius: 50px; padding: 3px; }
+  .lang-switch button {
+    background: transparent; border: none; color: var(--cream);
+    padding: 5px 10px; font-size: 0.75rem; font-family: 'Segoe UI', sans-serif;
+    font-weight: 600; border-radius: 50px; cursor: pointer;
+    transition: background 0.3s, color 0.3s; letter-spacing: 0.5px;
+  }
+  .lang-switch button:hover { color: var(--accent); }
+  .lang-switch button.active { background: var(--accent); color: var(--espresso); }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.35rem 0.85rem; border-radius: 50px;
+    font-size: 0.8rem; font-family: 'Segoe UI', sans-serif;
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+  .status-badge.open { background: rgba(76, 175, 80, 0.15); color: #4caf50; border: 1px solid rgba(76, 175, 80, 0.4); }
+  .status-badge.closed { background: rgba(244, 67, 54, 0.15); color: #f44336; border: 1px solid rgba(244, 67, 54, 0.4); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .theme-toggle {
+    background: transparent; border: 1px solid rgba(200, 162, 122, 0.4);
+    color: var(--cream); width: 38px; height: 38px; border-radius: 50%;
+    cursor: pointer; font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .theme-toggle:hover { transform: rotate(20deg) scale(1.1); background: rgba(212, 163, 115, 0.2); }
+
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--cream); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
+  .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    background: linear-gradient(rgba(43,26,18,0.6), rgba(43,26,18,0.7)),
+      url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600') center/cover;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; color: var(--foam); padding: 0 2rem;
+  }
+  .hero h1 { font-size: clamp(2.2rem, 6vw, 4.5rem); margin-bottom: 1rem; letter-spacing: 2px; animation: fadeUp 1s ease; }
+  .hero h1 span { color: var(--accent); font-style: italic; }
+  .hero p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; max-width: 600px; animation: fadeUp 1s ease 0.2s backwards; }
+  .hero-status { margin-bottom: 1.5rem; animation: fadeUp 1s ease 0.3s backwards; }
+  .hero-status .status-badge { font-size: 0.9rem; padding: 0.5rem 1rem; }
+
+  .loyalty-chip {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #2b1a12; font-family: 'Segoe UI', sans-serif;
+    font-weight: 700; font-size: 0.85rem;
+    padding: 0.5rem 1rem; border-radius: 50px;
+    margin-bottom: 1.25rem; animation: fadeUp 1s ease 0.35s backwards;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+    cursor: pointer; transition: transform 0.3s;
+  }
+  .loyalty-chip:hover { transform: scale(1.05); }
+
+  .btn {
+    display: inline-block; background: var(--accent); color: var(--espresso);
+    padding: 1rem 2.5rem; text-decoration: none; border-radius: 50px;
+    font-weight: bold; letter-spacing: 1px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: fadeUp 1s ease 0.4s backwards;
+    border: none; cursor: pointer; font-family: inherit; font-size: 1rem;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(212, 163, 115, 0.5); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  section { padding: 6rem 3rem; }
+  .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 1rem; color: var(--text); }
+  .section-subtitle { text-align: center; color: var(--text-soft); margin-bottom: 3rem; font-style: italic; }
+
+  .search-wrapper { max-width: 500px; margin: 0 auto 3rem; position: relative; }
+  .search-wrapper input {
+    width: 100%; padding: 0.9rem 1.2rem 0.9rem 3rem;
+    border: 1px solid var(--border); border-radius: 50px;
+    background: var(--card); font-family: inherit;
+    font-size: 1rem; color: var(--text);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .search-wrapper input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212, 163, 115, 0.15); }
+  .search-icon { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; opacity: 0.6; pointer-events: none; }
+  .search-clear {
+    position: absolute; right: 0.6rem; top: 50%;
+    transform: translateY(-50%); width: 30px; height: 30px;
+    border-radius: 50%; border: none; background: transparent;
+    color: var(--text-muted); font-size: 1.1rem; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    transition: background 0.3s, color 0.3s;
+  }
+  .search-clear.show { display: flex; }
+  .search-clear:hover { background: var(--border); color: var(--text); }
+  .no-results { grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-style: italic; padding: 3rem; font-size: 1.1rem; }
+
+  #menu { background: var(--bg-soft); }
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+  .menu-item {
+    background: var(--card); padding: 2rem; border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(43,26,18,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column; position: relative;
+  }
+  .menu-item:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(43,26,18,0.15); }
+  .menu-item.hidden { display: none; }
+
+  .best-seller {
+    position: absolute; top: -10px; right: 16px;
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #2b1a12; font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;
+    padding: 0.4rem 0.75rem; border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(184, 134, 11, 0.4);
+    text-transform: uppercase; display: flex; align-items: center; gap: 0.25rem;
+  }
+  .order-counter {
+    position: absolute; top: -10px; left: 16px;
+    background: linear-gradient(135deg, #f97316, #dc2626);
+    color: white; font-family: 'Segoe UI', sans-serif;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+    padding: 0.35rem 0.7rem; border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 1.5s infinite; }
+
+  .menu-item .emoji { font-size: 2.5rem; margin-bottom: 1rem; }
+  .menu-item h3 { font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--text); }
+  .menu-item p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; flex-grow: 1; }
+  .menu-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; }
+  .price { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+  .add-btn {
+    background: var(--accent); color: var(--espresso);
+    border: none; padding: 0.5rem 1rem;
+    border-radius: 50px; font-family: inherit;
+    font-weight: bold; font-size: 0.85rem;
+    cursor: pointer; transition: transform 0.2s, background 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .add-btn:hover { transform: scale(1.05); }
+  .add-btn.added { background: #4caf50; color: white; }
+
+  #gallery { background: var(--bg); }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; max-width: 1200px; margin: 0 auto; }
+  .gallery-item { position: relative; overflow: hidden; border-radius: 14px; aspect-ratio: 1; cursor: pointer; box-shadow: 0 4px 20px rgba(43,26,18,0.12); }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; display: block; }
+  .gallery-item:hover img { transform: scale(1.08); }
+  .gallery-item::after {
+    content: attr(data-caption);
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 1rem; background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: white; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s;
+  }
+  .gallery-item:hover::after { opacity: 1; }
+
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; justify-content: center; align-items: center; padding: 2rem; animation: fadeIn 0.3s; }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 90%; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; cursor: pointer; background: none; border: none; line-height: 1; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+  .lightbox-close:hover { opacity: 1; transform: rotate(90deg); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  #about { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto; }
+  #about img { width: 100%; border-radius: 20px; box-shadow: 0 20px 50px rgba(43,26,18,0.2); }
+  #about h2 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text); }
+  #about p { margin-bottom: 1rem; color: var(--text-soft); }
+  .stats { display: flex; gap: 2rem; margin-top: 2rem; }
+  .stat h4 { font-size: 2rem; color: var(--accent); }
+  .stat span { font-size: 0.85rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; }
+
+  #hours { background: var(--bg-dark); color: var(--cream); }
+  #hours .section-title { color: var(--cream); }
+  #hours .section-subtitle { color: var(--latte); }
+  .hours-list { max-width: 600px; margin: 0 auto; }
+  .hours-row { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(200,162,122,0.3); font-size: 1.05rem; transition: padding 0.3s; }
+  .hours-row.today { color: var(--accent); font-weight: bold; padding-left: 0.75rem; border-left: 3px solid var(--accent); }
+
+  #visit { background: var(--bg-soft); }
+  .visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; align-items: stretch; }
+  .visit-col { background: var(--card); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 40px rgba(43,26,18,0.1); border: 1px solid var(--border); }
+  .visit-col h3 { font-size: 1.6rem; color: var(--text); margin-bottom: 0.5rem; }
+  .visit-col .sub { color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem; font-size: 0.95rem; }
+  .map-wrapper { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  .map-wrapper iframe { display: block; width: 100%; height: 320px; border: 0; }
+  .contact-info { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border); }
+  .contact-info p { margin-bottom: 0.5rem; color: var(--text-soft); }
+  .contact-info a { color: var(--gold); text-decoration: none; font-weight: bold; }
+  .contact-info a:hover { text-decoration: underline; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.4rem; font-weight: bold; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); font-family: inherit;
+    font-size: 0.95rem; color: var(--text);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-submit { width: 100%; margin-top: 0.5rem; }
+
+  footer { background: #1a0f0a; color: var(--latte); text-align: center; padding: 3rem 2rem; font-size: 0.9rem; }
+  .socials { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .socials a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(200, 162, 122, 0.15); transition: transform 0.3s, background 0.3s; text-decoration: none; }
+  .socials a:hover { transform: translateY(-4px) scale(1.08); background: var(--accent); }
+  .socials svg { width: 20px; height: 20px; fill: var(--cream); transition: fill 0.3s; }
+  .socials a:hover svg { fill: var(--espresso); }
+  footer p { margin-bottom: 0.4rem; }
+  footer a.link { color: var(--accent); text-decoration: none; transition: color 0.3s; }
+  footer a.link:hover { color: var(--cream); text-decoration: underline; }
+
+  .cart-btn {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--accent); color: var(--espresso);
+    width: 60px; height: 60px; border-radius: 50%; border: none;
+    cursor: pointer; font-size: 1.5rem;
+    box-shadow: 0 8px 30px rgba(212, 163, 115, 0.5);
+    z-index: 90; transition: transform 0.3s, box-shadow 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cart-btn:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(212, 163, 115, 0.7); }
+  .cart-count {
+    position: absolute; top: -4px; right: -4px;
+    background: #f44336; color: white;
+    font-size: 0.75rem; font-weight: bold;
+    min-width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px; font-family: 'Segoe UI', sans-serif;
+    transform: scale(0); transition: transform 0.3s;
+  }
+  .cart-count.show { transform: scale(1); }
+
+  /* Admin button */
+  .admin-btn {
+    position: fixed; bottom: 30px; left: 30px;
+    background: rgba(43, 26, 18, 0.9);
+    color: var(--accent);
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    border: 1px solid var(--accent);
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 90;
+    transition: all 0.3s;
+    display: flex; align-items: center; gap: 0.4rem;
+    letter-spacing: 0.5px;
+  }
+  .admin-btn:hover {
+    background: var(--accent); color: var(--espresso);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(212, 163, 115, 0.5);
+  }
+
+  .cart-drawer {
+    position: fixed; top: 0; right: -440px;
+    width: 440px; max-width: 100vw; height: 100vh;
+    background: var(--card); box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+    z-index: 150; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
+  }
+  .cart-drawer.open { right: 0; }
+  .cart-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .cart-header h3 { color: var(--text); font-size: 1.3rem; }
+  .cart-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-soft); line-height: 1; transition: color 0.3s, transform 0.3s; }
+  .cart-close:hover { color: #f44336; transform: rotate(90deg); }
+  .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+  .cart-empty { text-align: center; color: var(--text-muted); font-style: italic; padding: 3rem 1rem; }
+  .cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+  .cart-item-info strong { color: var(--text); font-size: 0.95rem; display: block; margin-bottom: 0.15rem; }
+  .cart-item-info span { color: var(--gold); font-size: 0.85rem; font-weight: bold; }
+  .qty-controls { display: flex; align-items: center; gap: 0.4rem; }
+  .qty-btn { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-weight: bold; font-size: 0.9rem; line-height: 1; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+  .qty-btn:hover { background: var(--accent); color: var(--espresso); }
+  .qty-num { min-width: 22px; text-align: center; font-weight: bold; color: var(--text); font-size: 0.9rem; }
+  .remove-btn { background: none; border: none; color: #f44336; cursor: pointer; font-size: 1.2rem; opacity: 0.6; transition: opacity 0.3s; padding: 0; }
+  .remove-btn:hover { opacity: 1; }
+
+  .cart-footer { padding: 1.5rem; border-top: 1px solid var(--border); background: var(--bg-soft); max-height: 78vh; overflow-y: auto; }
+
+  .loyalty-banner {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #2b1a12; padding: 0.75rem 1rem;
+    border-radius: 12px; margin-bottom: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .loyalty-banner strong { font-size: 1.05rem; }
+  .loyalty-progress { height: 6px; background: rgba(43, 26, 18, 0.25); border-radius: 3px; margin-top: 0.4rem; overflow: hidden; }
+  .loyalty-progress > div { height: 100%; background: #2b1a12; transition: width 0.5s; border-radius: 3px; }
+
+  .pickup-section { margin-bottom: 1rem; }
+  .pickup-title {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--text-muted);
+    margin-bottom: 0.5rem; font-family: 'Segoe UI', sans-serif;
+    font-weight: 600;
+  }
+  .pickup-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .pickup-option {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.6rem 0.4rem;
+    text-align: center; cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--text-soft); transition: all 0.2s; line-height: 1.3;
+  }
+  .pickup-option:hover { border-color: var(--accent); }
+  .pickup-option.selected { background: var(--accent); color: var(--espresso); border-color: var(--accent); }
+  .pickup-option .po-icon { display: block; font-size: 1.2rem; margin-bottom: 0.15rem; }
+
+  .preorder-input {
+    width: 100%; padding: 0.65rem 0.85rem;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); font-family: inherit;
+    font-size: 0.9rem; color: var(--text);
+    margin-top: 0.5rem;
+  }
+  .preorder-input:focus { outline: none; border-color: var(--accent); }
+
+  .cart-total { display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: bold; color: var(--text); margin-bottom: 1rem; }
+  .cart-total .amount { color: var(--gold); }
+  .cart-footer .btn { width: 100%; }
+
+  .payment-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed var(--border); }
+  .payment-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.75rem; text-align: center; font-family: 'Segoe UI', sans-serif; font-weight: 600; }
+  .qr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .qr-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+  .qr-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); border-color: var(--accent); }
+  .qr-card img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 6px; background: #fff; display: block; margin-bottom: 0.4rem; }
+  .qr-card span { font-size: 0.8rem; font-weight: 700; color: var(--text); font-family: 'Segoe UI', sans-serif; letter-spacing: 0.5px; }
+  .qr-card.gcash span { color: #007bff; }
+  .qr-card.maya span { color: #00b14f; }
+
+  .screenshot-area {
+    background: var(--bg-soft);
+    border: 2px dashed var(--border);
+    border-radius: 14px; padding: 1rem;
+    margin-top: 1rem; text-align: center;
+  }
+  .screenshot-area label {
+    display: block; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-muted); font-family: 'Segoe UI', sans-serif;
+    font-weight: 600; margin-bottom: 0.75rem;
+  }
+  .screenshot-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .screenshot-btn {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 0.75rem; border-radius: 10px;
+    font-family: inherit; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .screenshot-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .screenshot-btn input { display: none; }
+  .screenshot-preview { display: none; margin-top: 0.75rem; position: relative; }
+  .screenshot-preview.show { display: block; }
+  .screenshot-preview img { max-width: 100%; max-height: 150px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .screenshot-remove {
+    position: absolute; top: -8px; right: -8px;
+    background: #f44336; color: white; border: none;
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; font-size: 1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 140; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .toast {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #4caf50; color: white;
+    padding: 0.85rem 1.5rem; border-radius: 50px;
+    font-family: 'Segoe UI', sans-serif; font-size: 0.9rem;
+    font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 300; max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: #f44336; }
+  .toast.info { background: #2196f3; }
+
+  .confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 250; justify-content: center; align-items: center; padding: 1.5rem; animation: fadeIn 0.3s; }
+  .confirm-modal.active { display: flex; }
+  .confirm-box {
+    background: var(--card); border-radius: 24px;
+    max-width: 560px; width: 100%;
+    max-height: 92vh; overflow-y: auto;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  @keyframes scaleIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .confirm-check {
+    width: 80px; height: 80px; margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: white;
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+    animation: bounce 0.6s ease 0.2s backwards;
+  }
+  @keyframes bounce { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+  .confirm-box h2 { color: var(--text); font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .confirm-box > p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; }
+  .order-summary { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; text-align: left; margin-bottom: 1.25rem; }
+  .order-summary h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.75rem; font-family: 'Segoe UI', sans-serif; }
+  .summary-line { display: flex; justify-content: space-between; padding: 0.35rem 0; color: var(--text-soft); font-size: 0.9rem; }
+  .summary-line.total { margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px dashed var(--border); font-weight: bold; color: var(--text); font-size: 1.05rem; }
+  .summary-line.total span:last-child { color: var(--gold); }
+  .pickup-note { font-size: 0.85rem; color: var(--text-muted); padding: 0.6rem 0.9rem; background: var(--bg-soft); border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; }
+  .pickup-note strong { color: var(--text); }
+
+  .loyalty-earned {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #2b1a12; padding: 0.65rem 1rem;
+    border-radius: 10px; margin-bottom: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 700; font-size: 0.9rem;
+    display: flex; justify-content: space-between; align-items: center;
+    animation: bounce 0.6s ease 0.4s backwards;
+  }
+
+  .confirm-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+  .confirm-actions .btn { animation: none; padding: 0.75rem 0.5rem; font-size: 0.85rem; letter-spacing: 0.5px; }
+  .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+  .btn-outline:hover { background: var(--accent); color: var(--espresso); transform: translateY(-2px); }
+  .btn-print { background: var(--coffee); color: var(--cream); border: 2px solid var(--coffee); }
+  .btn-print:hover { background: var(--espresso); border-color: var(--espresso); }
+
+  .loyalty-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 260; justify-content: center; align-items: center; padding: 1.5rem; animation: fadeIn 0.3s; }
+  .loyalty-modal.active { display: flex; }
+  .loyalty-box {
+    background: var(--card); border-radius: 24px;
+    max-width: 420px; width: 100%;
+    padding: 2.5rem 2rem 2rem; text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .loyalty-cup {
+    width: 100px; height: 100px; margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    box-shadow: 0 10px 30px rgba(184, 134, 11, 0.5);
+  }
+  .loyalty-box h2 { color: var(--text); font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .loyalty-box p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
+  .stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin: 1.25rem 0; }
+  .stamp {
+    aspect-ratio: 1; border-radius: 50%;
+    border: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem; color: var(--text-muted);
+    background: var(--bg-soft); transition: all 0.3s;
+  }
+  .stamp.filled { background: linear-gradient(135deg, #ffd700, #b8860b); border-style: solid; border-color: #b8860b; color: #2b1a12; }
+  .stamp.free { background: linear-gradient(135deg, #4caf50, #2e7d32); border-style: solid; border-color: #2e7d32; color: white; }
+
+  /* Admin Modal */
+  .admin-modal { display: none; position: fixed; inset: 0; background: rgba(15, 8, 5, 0.95); z-index: 270; overflow-y: auto; padding: 2rem; animation: fadeIn 0.3s; }
+  .admin-modal.active { display: block; }
+  .admin-wrap { max-width: 1100px; margin: 0 auto; color: #f5ede1; }
+  .admin-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 1.5rem; margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(200,162,122,0.2);
+  }
+  .admin-header h1 { font-size: 1.5rem; color: #d4a373; }
+  .admin-header h1 small { color: #8a7563; font-weight: normal; font-size: 0.85rem; margin-left: 0.5rem; }
+  .admin-actions { display: flex; gap: 0.5rem; }
+  .admin-actions button {
+    background: #d4a373; color: #2b1a12; border: none;
+    padding: 0.5rem 1rem; border-radius: 8px;
+    font-family: inherit; font-weight: 700;
+    font-size: 0.85rem; cursor: pointer; transition: transform 0.2s;
+  }
+  .admin-actions button:hover { transform: translateY(-2px); }
+  .admin-actions button.danger { background: #f44336; color: white; }
+  .admin-actions button.ghost { background: transparent; color: #d4a373; border: 1px solid #d4a373; }
+
+  .admin-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .admin-stat-card {
+    background: #241610;
+    border: 1px solid rgba(212,163,115,0.2);
+    border-radius: 14px; padding: 1.25rem;
+  }
+  .admin-stat-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: #a08a72; margin-bottom: 0.35rem; }
+  .admin-stat-card .value { font-size: 1.8rem; font-weight: 800; color: #d4a373; line-height: 1; }
+  .admin-stat-card .sub { font-size: 0.8rem; color: #8a7563; margin-top: 0.4rem; }
+
+  .orders-table {
+    background: #241610;
+    border: 1px solid rgba(212,163,115,0.2);
+    border-radius: 14px; overflow: hidden;
+  }
+  .table-header { padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,163,115,0.15); }
+  .table-header h2 { font-size: 1.1rem; color: #d4a373; }
+  .table-header span { font-size: 0.8rem; color: #8a7563; }
+  .admin-table { width: 100%; border-collapse: collapse; }
+  .admin-table th, .admin-table td {
+    padding: 0.85rem 1.25rem; text-align: left;
+    font-size: 0.9rem; border-bottom: 1px solid rgba(212,163,115,0.08);
+  }
+  .admin-table th {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 1px; color: #a08a72;
+    background: rgba(212,163,115,0.05); font-weight: 600;
+  }
+  .admin-table tr:hover { background: rgba(212,163,115,0.04); }
+  .admin-table td.id { font-family: 'Courier New', monospace; color: #d4a373; font-weight: 700; }
+  .admin-table td.total { color: #ffd700; font-weight: 700; }
+  .pill { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
+  .pill.paid { background: rgba(76,175,80,0.2); color: #4caf50; }
+  .pill.cash { background: rgba(255,152,0,0.2); color: #ff9800; }
+  .admin-empty { text-align: center; padding: 3rem 1rem; color: #8a7563; font-style: italic; }
+
+  .row-expand { display: none; padding: 1rem 1.25rem; background: rgba(0,0,0,0.25); font-size: 0.85rem; color: #c8a27a; }
+  .row-expand.show { display: table-row; }
+  .row-expand .item-line { display: flex; justify-content: space-between; padding: 0.2rem 0; }
+  .expand-btn {
+    background: transparent; border: 1px solid #d4a373; color: #d4a373;
+    padding: 0.25rem 0.6rem; border-radius: 50px;
+    font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .expand-btn:hover { background: #d4a373; color: #2b1a12; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.25rem; }
+    .hamburger { display: flex; }
+    .nav-right { gap: 0.75rem; }
+    .status-badge.nav-status { display: none; }
+    .lang-switch button { padding: 4px 8px; font-size: 0.7rem; }
+    nav ul {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: rgba(43, 26, 18, 0.98);
+      flex-direction: column; gap: 0; padding: 0;
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    nav ul.open { max-height: 400px; padding: 1rem 0; }
+    nav ul li { width: 100%; }
+    nav ul a { display: block; padding: 0.85rem 1.5rem; font-size: 1rem; }
+    section { padding: 4rem 1.5rem; }
+    #about { grid-template-columns: 1fr; gap: 2rem; }
+    .stats { flex-wrap: wrap; gap: 1.5rem; }
+    .visit-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .section-title { font-size: 2rem; }
+    .cart-drawer { width: 100vw; right: -100vw; }
+    .confirm-actions { grid-template-columns: 1fr; }
+    .admin-btn { bottom: 100px; left: 30px; }
+    .admin-modal { padding: 1rem; }
+    .admin-table th, .admin-table td { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
+  }
+
+  @media print {
+    body * { visibility: hidden !important; }
+    #printReceipt, #printReceipt * { visibility: visible !important; }
+    #printReceipt {
+      position: absolute !important; left: 0; top: 0;
+      width: 100%; padding: 2rem;
+      background: white !important; color: black !important;
+      font-family: 'Courier New', monospace; display: block !important;
+    }
+    .confirm-actions, .confirm-check { display: none !important; }
+  }
+
+  #printReceipt { display: none; }
+  #printReceipt .r-header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 1rem; margin-bottom: 1rem; }
+  #printReceipt .r-header h1 { font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 0.25rem; }
+  #printReceipt .r-header p { font-size: 0.8rem; margin: 0.1rem 0; }
+  #printReceipt .r-meta { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px dashed #333; }
+  #printReceipt .r-item { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.25rem 0; }
+  #printReceipt .r-total { display: flex; justify-content: space-between; font-size: 1rem; font-weight: bold; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 2px dashed #333; }
+  #printReceipt .r-footer { text-align: center; font-size: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #333; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">☕ Roveyahh's <span>Coffee</span></div>
+  <ul id="navMenu">
+    <li><a href="#menu" data-i18n="nav_menu">Menu</a></li>
+    <li><a href="#gallery" data-i18n="nav_gallery">Gallery</a></li>
+    <li><a href="#about" data-i18n="nav_about">About</a></li>
+    <li><a href="#hours" data-i18n="nav_hours">Hours</a></li>
+    <li><a href="#visit" data-i18n="nav_visit">Visit</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="navStatus" class="status-badge nav-status"></span>
+    <div class="lang-switch" id="langSwitch">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="fil">FIL</button>
+      <button data-lang="ceb">BIS</button>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-status" id="heroStatus"></div>
+  <div class="loyalty-chip" id="loyaltyChip">⭐ <span data-i18n="loyalty_chip">Loyalty</span>: 0/9</div>
+  <h1 data-i18n="hero_title_html">Welcome to <span>Roveyahh's</span><br>Coffee Shop</h1>
+  <p data-i18n="hero_sub">Freshly roasted, lovingly brewed. Your cozy corner in Downtown Davao City for small-batch coffee and warm pastries.</p>
+  <a href="#menu" class="btn" data-i18n="hero_btn">Explore Our Menu</a>
+</header>
+
+<section id="menu">
+  <h2 class="section-title" data-i18n="menu_title">Our Menu</h2>
+  <p class="section-subtitle" data-i18n="menu_sub">Crafted with care, served with love</p>
+
+  <div class="search-wrapper">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="menuSearch" placeholder="Search the menu..." data-i18n-placeholder="search_placeholder">
+    <button class="search-clear" id="searchClear" aria-label="Clear">✕</button>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-item" data-name="Roveyahh's Signature Espresso" data-price="120" data-keys="espresso signature" data-orders="2847">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">2,847</span> <span data-i18n="ordered">ordered</span></span>
+      <span class="best-seller">⭐ <span data-i18n="best_seller">Best Seller</span></span>
+      <div class="emoji">☕</div>
+      <h3 data-i18n="item_espresso">Roveyahh's Signature Espresso</h3>
+      <p data-i18n="item_espresso_desc">Rich, velvety double shot pulled from our house blend.</p>
+      <div class="menu-footer"><div class="price">₱120</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+    <div class="menu-item" data-name="Vanilla Latte" data-price="150" data-keys="vanilla latte" data-orders="2134">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">2,134</span> <span data-i18n="ordered">ordered</span></span>
+      <span class="best-seller">⭐ <span data-i18n="best_seller">Best Seller</span></span>
+      <div class="emoji">🥛</div>
+      <h3 data-i18n="item_latte">Vanilla Latte</h3>
+      <p data-i18n="item_latte_desc">Smooth espresso, steamed milk, and a hint of Madagascar vanilla.</p>
+      <div class="menu-footer"><div class="price">₱150</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+    <div class="menu-item" data-name="Cold Brew" data-price="140" data-keys="cold brew" data-orders="1729">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">1,729</span> <span data-i18n="ordered">ordered</span></span>
+      <span class="best-seller">⭐ <span data-i18n="best_seller">Best Seller</span></span>
+      <div class="emoji">🧊</div>
+      <h3 data-i18n="item_coldbrew">Cold Brew</h3>
+      <p data-i18n="item_coldbrew_desc">Steeped 18 hours for a smooth, bold, low-acid taste.</p>
+      <div class="menu-footer"><div class="price">₱140</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+    <div class="menu-item" data-name="Butter Croissant" data-price="95" data-keys="butter croissant pastry" data-orders="1245">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">1,245</span> <span data-i18n="ordered">ordered</span></span>
+      <div class="emoji">🥐</div>
+      <h3 data-i18n="item_croissant">Butter Croissant</h3>
+      <p data-i18n="item_croissant_desc">Flaky, golden, baked fresh every morning at 6 AM.</p>
+      <div class="menu-footer"><div class="price">₱95</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+    <div class="menu-item" data-name="Tiramisu Slice" data-price="180" data-keys="tiramisu dessert cake" data-orders="987">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">987</span> <span data-i18n="ordered">ordered</span></span>
+      <div class="emoji">🍰</div>
+      <h3 data-i18n="item_tiramisu">Tiramisu Slice</h3>
+      <p data-i18n="item_tiramisu_desc">Espresso-soaked ladyfingers with mascarpone cream.</p>
+      <div class="menu-footer"><div class="price">₱180</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+    <div class="menu-item" data-name="Matcha Latte" data-price="160" data-keys="matcha latte green tea" data-orders="1532">
+      <span class="order-counter"><span class="live-dot"></span> <span class="counter-num">1,532</span> <span data-i18n="ordered">ordered</span></span>
+      <div class="emoji">🍵</div>
+      <h3 data-i18n="item_matcha">Matcha Latte</h3>
+      <p data-i18n="item_matcha_desc">Ceremonial-grade matcha whisked with oat milk.</p>
+      <div class="menu-footer"><div class="price">₱160</div><button class="add-btn" data-i18n="add_btn">+ Add</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <h2 class="section-title" data-i18n="gallery_title">From Our Shop</h2>
+  <p class="section-subtitle" data-i18n="gallery_sub">A peek inside Roveyahh's</p>
+  <div class="gallery-grid">
+    <div class="gallery-item" data-caption="Freshly pulled espresso"><img src="https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600" alt="Espresso"></div>
+    <div class="gallery-item" data-caption="Latte art in progress"><img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=600" alt="Latte art"></div>
+    <div class="gallery-item" data-caption="Cozy corner seats"><img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600" alt="Interior"></div>
+    <div class="gallery-item" data-caption="Fresh pastries daily"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600" alt="Pastries"></div>
+    <div class="gallery-item" data-caption="Our house blend beans"><img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Beans"></div>
+    <div class="gallery-item" data-caption="Cold brew on tap"><img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600" alt="Cold brew"></div>
+    <div class="gallery-item" data-caption="Morning rush"><img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600" alt="Shop"></div>
+    <div class="gallery-item" data-caption="Sweet treats"><img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=600" alt="Desserts"></div>
+  </div>
+</section>
+
+<section id="about">
+  <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800" alt="Barista">
+  <div>
+    <h2 data-i18n="about_title">Our Story</h2>
+    <p data-i18n="about_p1">Founded in 2015, Roveyahh's Coffee Shop started as a tiny cart on the corner of 5th and Main. We believed that great coffee shouldn't be complicated — just honest beans, roasted with patience, and served with a smile.</p>
+    <p data-i18n="about_p2">Today we source directly from family farms in Ethiopia, Colombia, and Guatemala, roasting every batch in-house to bring out the best in every cup.</p>
+    <div class="stats">
+      <div class="stat"><h4>10K+</h4><span data-i18n="stat_cups">Cups / Month</span></div>
+      <div class="stat"><h4>8</h4><span data-i18n="stat_farms">Origin Farms</span></div>
+      <div class="stat"><h4>9yrs</h4><span data-i18n="stat_years">Roasting</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="hours">
+  <h2 class="section-title" data-i18n="hours_title">Opening Hours</h2>
+  <p class="section-subtitle" id="hoursSubtitle" data-i18n="hours_sub">Come say hi at Roveyahh's</p>
+  <div class="hours-list">
+    <div class="hours-row" data-day="1"><span data-i18n="day_mon">Monday</span><span>7:00 AM – 6:00 PM</span></div>
+    <div class="hours-row" data-day="2"><span data-i18n="day_tue">Tuesday</span><span>7:00 AM – 6:00 PM</span></div>
+    <div class="hours-row" data-day="3"><span data-i18n="day_wed">Wednesday</span><span>7:00 AM – 6:00 PM</span></div>
+    <div class="hours-row" data-day="4"><span data-i18n="day_thu">Thursday</span><span>7:00 AM – 8:00 PM</span></div>
+    <div class="hours-row" data-day="5"><span data-i18n="day_fri">Friday</span><span>7:00 AM – 9:00 PM</span></div>
+    <div class="hours-row" data-day="6"><span data-i18n="day_sat">Saturday</span><span>8:00 AM – 9:00 PM</span></div>
+    <div class="hours-row" data-day="0"><span data-i18n="day_sun">Sunday</span><span>8:00 AM – 4:00 PM</span></div>
+  </div>
+</section>
+
+<section id="visit">
+  <h2 class="section-title" data-i18n="visit_title">Visit Us</h2>
+  <p class="section-subtitle" data-i18n="visit_sub">Find us in Downtown Davao City — or book a table below</p>
+  <div class="visit-grid">
+    <div class="visit-col">
+      <h3 data-i18n="find_us">📍 Find Us</h3>
+      <p class="sub">Downtown, Davao City, Philippines</p>
+      <div class="map-wrapper">
+        <iframe src="https://www.google.com/maps?q=Downtown,+Davao+City,+Philippines&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Location"></iframe>
+      </div>
+      <div class="contact-info">
+        <p>📞 <a href="tel:+639369533153">0936 953 3153</a></p>
+        <p>✉️ <a href="mailto:roveyahh@gmail.com">roveyahh@gmail.com</a></p>
+        <p data-i18n="contact_hours">🕒 Open daily from 7:00 AM</p>
+      </div>
+    </div>
+    <div class="visit-col">
+      <h3 data-i18n="reserve_title">📅 Reserve a Table</h3>
+      <p class="sub" data-i18n="reserve_sub">We'll confirm your booking within 1 hour</p>
+      <form id="reservationForm">
+        <div class="form-group">
+          <label for="name" data-i18n="form_name">Your Name</label>
+          <input type="text" id="name" required data-i18n-placeholder="form_name_ph" placeholder="e.g. Juan Dela Cruz">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label for="date" data-i18n="form_date">Date</label><input type="date" id="date" required></div>
+          <div class="form-group"><label for="time" data-i18n="form_time">Time</label><input type="time" id="time" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="guests" data-i18n="form_guests">Guests</label>
+            <select id="guests" required>
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7+">7+</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="phone" data-i18n="form_phone">Phone</label><input type="tel" id="phone" required placeholder="09XX XXX XXXX"></div>
+        </div>
+        <div class="form-group">
+          <label for="notes" data-i18n="form_notes">Special Requests (optional)</label>
+          <textarea id="notes" data-i18n-placeholder="form_notes_ph" placeholder="Window seat, birthday cake, etc."></textarea>
+        </div>
+        <button type="submit" class="btn form-submit" data-i18n="form_submit">Reserve Now ☕</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="socials">
+    <a href="https://facebook.com/roveyahhscoffee" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a>
+    <a href="https://instagram.com/roveyahhscoffee" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.8c-3.15 0-3.5.01-4.73.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.42.42-.67.8-.88 1.35-.16.42-.35 1.03-.4 2.17-.06 1.24-.07 1.6-.07 4.73s.01 3.5.07 4.73c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.42.42.8.67 1.35.88.42.16 1.03.35 2.17.4 1.24.06 1.6.07 4.73.07s3.5-.01 4.73-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.42-.42.67-.8.88-1.35.16-.42.35-1.03.4-2.17.06-1.24.07-1.6.07-4.73s-.01-3.5-.07-4.73c-.05-1.14-.24-1.76-.4-2.17-.21-.55-.47-.94-.88-1.35-.42-.42-.8-.67-1.35-.88-.42-.16-1.03-.35-2.17-.4-1.24-.06-1.6-.07-4.73-.07zm0 3.06a5.14 5.14 0 1 1 0 10.28 5.14 5.14 0 0 1 0-10.28zm0 8.47a3.34 3.34 0 1 0 0-6.67 3.34 3.34 0 0 0 0 6.67zm6.54-8.67a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"/></svg></a>
+    <a href="https://tiktok.com/@roveyahhscoffee" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3 0 .58.05.85.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></a>
+  </div>
+  <p><strong>Roveyahh's Coffee Shop</strong> · Downtown, Davao City</p>
+  <p>📞 <a href="tel:+639369533153" class="link">0936 953 3153</a> · ✉️ <a href="mailto:roveyahh@gmail.com" class="link">roveyahh@gmail.com</a></p>
+  <p style="margin-top:1.5rem; opacity:0.6;">© 2025 Roveyahh's Coffee Shop. All rights reserved.</p>
+</footer>
+
+<!-- ADMIN BUTTON -->
+<button class="admin-btn" id="adminBtn" title="Admin Panel (Ctrl+Shift+A)">🔒 Admin</button>
+
+<!-- CART BUTTON -->
+<button class="cart-btn" id="cartBtn" aria-label="Open cart">
+  🛒
+  <span class="cart-count" id="cartCount">0</span>
+</button>
+
+<!-- CART DRAWER -->
+<div class="overlay" id="overlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3 data-i18n="cart_title">Your Order</h3>
+    <button class="cart-close" id="cartClose" aria-label="Close">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p class="cart-empty" data-i18n="cart_empty">Your cart is empty ☕</p>
+  </div>
+  <div class="cart-footer">
+    <div class="loyalty-banner">
+      <div>
+        <strong data-i18n="loyalty_title">⭐ Loyalty Card</strong>
+        <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 0.15rem;" id="loyaltyText">0 / 9</div>
+        <div class="loyalty-progress"><div id="loyaltyProgress" style="width: 0%"></div></div>
+      </div>
+    </div>
+
+    <div class="pickup-section" id="pickupSection" style="display: none;">
+      <p class="pickup-title" data-i18n="pickup_title">When would you like it?</p>
+      <div class="pickup-options">
+        <div class="pickup-option selected" data-mode="asap" data-minutes="15">
+          <span class="po-icon">⚡</span>
+          <span data-i18n="pickup_asap">ASAP</span>
+        </div>
+        <div class="pickup-option" data-mode="scheduled">
+          <span class="po-icon">🗓️</span>
+          <span data-i18n="pickup_schedule">Schedule</span>
+        </div>
+      </div>
+      <div id="preorderBox" style="display: none;">
+        <input type="datetime-local" class="preorder-input" id="preorderTime">
+      </div>
+    </div>
+
+    <div class="cart-total">
+      <span data-i18n="cart_total">Total</span>
+      <span class="amount" id="cartTotal">₱0</span>
+    </div>
+    <button class="btn" id="checkoutBtn" data-i18n="cart_checkout">Order via Email ✉️</button>
+
+    <div class="payment-section">
+      <p class="payment-title" data-i18n="pay_title">Pay via</p>
+      <div class="qr-grid">
+        <div class="qr-card gcash" data-method="GCash">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=GCASH-09369533153" alt="GCash QR">
+          <span>GCash</span>
+        </div>
+        <div class="qr-card maya" data-method="Maya">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MAYA-09369533153" alt="Maya QR">
+          <span>Maya</span>
+        </div>
+      </div>
+      <div class="screenshot-area">
+        <label data-i18n="upload_receipt">📸 Upload Payment Screenshot</label>
+        <div class="screenshot-buttons">
+          <button class="screenshot-btn" id="cameraBtn" type="button">📷 <span data-i18n="take_photo">Take Photo</span></button>
+          <button class="screenshot-btn" id="galleryBtn" type="button">🖼️ <span data-i18n="from_gallery">From Gallery</span></button>
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+          <input type="file" id="galleryInput" accept="image/*" style="display:none">
+        </div>
+        <div class="screenshot-preview" id="screenshotPreview">
+          <img id="screenshotImg" alt="Payment screenshot">
+          <button class="screenshot-remove" id="screenshotRemove" aria-label="Remove">×</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">×</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- LOYALTY MODAL -->
+<div class="loyalty-modal" id="loyaltyModal">
+  <div class="loyalty-box">
+    <div class="loyalty-cup">☕</div>
+    <h2 data-i18n="loyalty_modal_title">Your Loyalty Card</h2>
+    <p data-i18n="loyalty_modal_sub">Buy 9 drinks, get the 10th free!</p>
+    <div class="stamp-grid" id="stampGrid"></div>
+    <p style="font-size: 0.85rem;" id="loyaltyRewardsText">Free drinks earned: 0</p>
+    <button class="btn" id="loyaltyClose" style="margin-top: 1rem; animation: none;" data-i18n="confirm_done">Done</button>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="admin-modal" id="adminModal">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <h1>📊 Admin Panel <small>Roveyahh's Coffee Shop</small></h1>
+      <div class="admin-actions">
+        <button class="ghost" onclick="renderAdmin()">🔄 Refresh</button>
+        <button class="danger" onclick="clearOrders()">🗑️ Clear All</button>
+        <button onclick="closeAdmin()">✕ Close</button>
+      </div>
+    </div>
+
+    <div class="admin-stats-row">
+      <div class="admin-stat-card">
+        <div class="label">Total Orders</div>
+        <div class="value" id="statOrders">0</div>
+        <div class="sub" id="statOrdersToday">0 today</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="label">Total Revenue</div>
+        <div class="value" id="statRevenue">₱0</div>
+        <div class="sub" id="statRevenueToday">₱0 today</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="label">Items Sold</div>
+        <div class="value" id="statItems">0</div>
+        <div class="sub">across all orders</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="label">Top Seller</div>
+        <div class="value" id="statTop" style="font-size: 1.1rem;">—</div>
+        <div class="sub" id="statTopCount">—</div>
+      </div>
+    </div>
+
+    <div class="orders-table">
+      <div class="table-header">
+        <h2>Recent Orders</h2>
+        <span id="orderCountLabel">0 orders</span>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Time</th>
+            <th>Items</th>
+            <th>Pickup</th>
+            <th>Payment</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr><td colspan="7" class="admin-empty">No orders yet ☕</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div class="confirm-modal" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-check">✓</div>
+    <h2 data-i18n="confirm_title">Order Received!</h2>
+    <p data-i18n="confirm_sub">Your order has been sent to our Gmail. We'll confirm your pickup time shortly.</p>
+
+    <div class="loyalty-earned" id="loyaltyEarned" style="display: none;">
+      <span>⭐ <span data-i18n="loyalty_earned">Loyalty stamps:</span> <strong id="stampsEarned">+1</strong></span>
+      <span id="loyaltyNewCount">1/9</span>
+    </div>
+
+    <div class="order-summary" id="orderSummary"></div>
+
+    <div class="confirm-actions">
+      <button class="btn btn-print" id="printBtn" data-i18n="btn_print">🖨️ Print</button>
+      <button class="btn btn-outline" id="confirmClose" data-i18n="confirm_new">New Order</button>
+      <button class="btn" id="confirmDone" data-i18n="confirm_done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN PRINT RECEIPT -->
+<div id="printReceipt">
+  <div class="r-header">
+    <h1>ROVEYAHH'S COFFEE SHOP</h1>
+    <p>Downtown, Davao City, Philippines</p>
+    <p>0936 953 3153 · roveyahh@gmail.com</p>
+  </div>
+  <div class="r-meta">
+    <span id="rDate"></span>
+    <span id="rOrderNo"></span>
+  </div>
+  <div id="rItems"></div>
+  <div class="r-total"><span>TOTAL</span><span id="rTotal"></span></div>
+  <div class="pickup-note" style="margin-top: 1rem; border: 1px dashed #333;">
+    <span>Pickup:</span><strong id="rPickup"></strong>
+  </div>
+  <div class="r-footer">
+    <p>Thank you for your order! ☕</p>
+    <p>Please present this receipt upon pickup.</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ THEME ============ */
+const themeToggle = document.getElementById('themeToggle');
+const htmlEl = document.documentElement;
+const savedTheme = localStorage.getItem('roveyahh-theme') || 'light';
+htmlEl.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+themeToggle.addEventListener('click', () => {
+  const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  htmlEl.setAttribute('data-theme', next);
+  localStorage.setItem('roveyahh-theme', next);
+  themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+/* ============ HAMBURGER ============ */
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('navMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  navMenu.classList.toggle('open');
+});
+navMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('open');
+  });
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+const fadeObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = 1;
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.menu-item').forEach((el, i) => {
+  el.style.opacity = 0;
+  el.style.transform = 'translateY(30px)';
+  el.style.transition = `all 0.6s ease ${i * 0.1}s`;
+  fadeObserver.observe(el);
+});
+
+/* ============ LIGHTBOX ============ */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+document.querySelectorAll('.gallery-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const img = item.querySelector('img');
+    lightboxImg.src = img.src.replace('w=600', 'w=1200');
+    lightboxImg.alt = img.alt;
+    lightbox.classList.add('active');
+  });
+});
+const closeLightbox = () => lightbox.classList.remove('active');
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeLightbox(); closeCart(); closeConfirm(); closeLoyalty(); closeAdmin(); }
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); openAdmin(); }
+});
+
+/* ============ HOURS ============ */
+const schedule = {
+  0: { open: '08:00', close: '16:00' },
+  1: { open: '07:00', close: '18:00' },
+  2: { open: '07:00', close: '18:00' },
+  3: { open: '07:00', close: '18:00' },
+  4: { open: '07:00', close: '20:00' },
+  5: { open: '07:00', close: '21:00' },
+  6: { open: '08:00', close: '21:00' },
+};
+const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+function getStatus() {
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const today = schedule[now.getDay()];
+  const openMin = toMin(today.open);
+  const closeMin = toMin(today.close);
+  if (nowMin >= openMin && nowMin < closeMin) {
+    const left = closeMin - nowMin;
+    const detail = left >= 60 ? `${Math.floor(left/60)}h ${left%60}m` : `${left}m`;
+    return { open: true, detail };
+  }
+  return { open: false };
+}
+function renderStatus() {
+  const s = getStatus();
+  const i18n = translations[currentLang];
+  const label = s.open ? `${i18n.status_open} · ${i18n.status_closes_in} ${s.detail}` : i18n.status_closed;
+  const cls = s.open ? 'open' : 'closed';
+  const htmlStr = `<span class="status-dot"></span> ${label}`;
+  const navStatus = document.getElementById('navStatus');
+  navStatus.className = `status-badge nav-status ${cls}`;
+  navStatus.innerHTML = htmlStr;
+  document.getElementById('heroStatus').innerHTML = `<span class="status-badge ${cls}">${htmlStr}</span>`;
+  document.getElementById('hoursSubtitle').textContent = s.open ? i18n.hours_open_now : i18n.hours_closed_now;
+}
+document.querySelector(`.hours-row[data-day="${new Date().getDay()}"]`)?.classList.add('today');
+
+/* ============ SEARCH ============ */
+const searchInput = document.getElementById('menuSearch');
+const searchClear = document.getElementById('searchClear');
+const menuGrid = document.getElementById('menuGrid');
+function filterMenu() {
+  const q = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('show', q.length > 0);
+  let visibleCount = 0;
+  document.querySelectorAll('.menu-item').forEach(item => {
+    const haystack = (item.dataset.name + ' ' + item.dataset.keys + ' ' + item.querySelector('h3').textContent).toLowerCase();
+    const match = haystack.includes(q);
+    item.classList.toggle('hidden', !match);
+    if (match) visibleCount++;
+  });
+  const existing = menuGrid.querySelector('.no-results');
+  if (existing) existing.remove();
+  if (visibleCount === 0) {
+    const noRes = document.createElement('div');
+    noRes.className = 'no-results';
+    noRes.textContent = translations[currentLang].no_results;
+    menuGrid.appendChild(noRes);
+  }
+}
+searchInput.addEventListener('input', filterMenu);
+searchClear.addEventListener('click', () => { searchInput.value = ''; filterMenu(); searchInput.focus(); });
+
+/* ============ LIVE COUNTERS ============ */
+function tickCounters() {
+  document.querySelectorAll('.menu-item').forEach(item => {
+    const base = parseInt(item.dataset.orders || 0, 10);
+    const bump = Math.floor(Math.random() * 3);
+    const numEl = item.querySelector('.counter-num');
+    if (numEl) numEl.textContent = (base + bump).toLocaleString();
+  });
+}
+tickCounters();
+setInterval(tickCounters, 8000);
+
+/* ============ LOYALTY ============ */
+const LOYALTY_TARGET = 9;
+function getLoyalty() {
+  const data = JSON.parse(localStorage.getItem('roveyahh-loyalty') || '{}');
+  return { stamps: data.stamps || 0, rewards: data.rewards || 0, lifetime: data.lifetime || 0 };
+}
+function saveLoyalty(data) { localStorage.setItem('roveyahh-loyalty', JSON.stringify(data)); }
+function updateLoyaltyUI() {
+  const l = getLoyalty();
+  const stamps = l.stamps % LOYALTY_TARGET;
+  const isReward = l.stamps > 0 && stamps === 0;
+  document.getElementById('loyaltyChip').innerHTML = `⭐ <span data-i18n="loyalty_chip">Loyalty</span>: ${stamps}/${LOYALTY_TARGET} ${isReward ? '🎁' : ''}`;
+  document.getElementById('loyaltyText').textContent = `${stamps} / ${LOYALTY_TARGET} ${translations[currentLang].stamps_label || 'stamps'} — 1 ${translations[currentLang].free_drink || 'free drink'} at ${LOYALTY_TARGET}`;
+  document.getElementById('loyaltyProgress').style.width = (stamps / LOYALTY_TARGET * 100) + '%';
+  const grid = document.getElementById('stampGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < LOYALTY_TARGET; i++) {
+    const div = document.createElement('div');
+    div.className = 'stamp' + (i < stamps ? ' filled' : '');
+    div.textContent = i < stamps ? '☕' : '';
+    grid.appendChild(div);
+  }
+  const free = document.createElement('div');
+  free.className = 'stamp' + (isReward ? ' free' : '');
+  free.textContent = isReward ? '🎁' : '★';
+  grid.appendChild(free);
+  document.getElementById('loyaltyRewardsText').textContent = `${translations[currentLang].free_drinks_earned || 'Free drinks earned'}: ${l.rewards}`;
+}
+function addLoyaltyStamps(count) {
+  const l = getLoyalty();
+  l.stamps += count;
+  l.lifetime += count;
+  while (l.stamps >= LOYALTY_TARGET) { l.stamps -= LOYALTY_TARGET; l.rewards += 1; }
+  saveLoyalty(l);
+  updateLoyaltyUI();
+}
+const loyaltyModal = document.getElementById('loyaltyModal');
+const openLoyalty = () => { updateLoyaltyUI(); loyaltyModal.classList.add('active'); };
+const closeLoyalty = () => loyaltyModal.classList.remove('active');
+document.getElementById('loyaltyChip').addEventListener('click', openLoyalty);
+document.getElementById('loyaltyClose').addEventListener('click', closeLoyalty);
+loyaltyModal.addEventListener('click', e => { if (e.target === loyaltyModal) closeLoyalty(); });
+
+/* ============ PAYMENT SCREENSHOT ============ */
+let paymentScreenshot = null;
+function handleScreenshot(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Image too large (max 5MB)', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    paymentScreenshot = e.target.result;
+    document.getElementById('screenshotImg').src = paymentScreenshot;
+    document.getElementById('screenshotPreview').classList.add('show');
+    showToast('📸 Screenshot attached!', 'info');
+  };
+  reader.readAsDataURL(file);
+}
+document.getElementById('cameraInput').addEventListener('change', (e) => handleScreenshot(e.target.files[0]));
+document.getElementById('galleryInput').addEventListener('change', (e) => handleScreenshot(e.target.files[0]));
+document.getElementById('cameraBtn').addEventListener('click', () => document.getElementById('cameraInput').click());
+document.getElementById('galleryBtn').addEventListener('click', () => document.getElementById('galleryInput').click());
+document.getElementById('screenshotRemove').addEventListener('click', () => {
+  paymentScreenshot = null;
+  document.getElementById('screenshotPreview').classList.remove('show');
+  document.getElementById('cameraInput').value = '';
+  document.getElementById('galleryInput').value = '';
+});
+
+/* ============ CART ============ */
+let cart = JSON.parse(localStorage.getItem('roveyahh-cart') || '[]');
+let pickupMode = 'asap';
+let pickupMinutes = 15;
+
+const cartDrawer = document.getElementById('cartDrawer');
+const cartBtn = document.getElementById('cartBtn');
+const cartClose = document.getElementById('cartClose');
+const cartItems = document.getElementById('cartItems');
+const cartCount = document.getElementById('cartCount');
+const cartTotal = document.getElementById('cartTotal');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const overlay = document.getElementById('overlay');
+const toast = document.getElementById('toast');
+const pickupSection = document.getElementById('pickupSection');
+const preorderBox = document.getElementById('preorderBox');
+const preorderInput = document.getElementById('preorderTime');
+
+const saveCart = () => localStorage.setItem('roveyahh-cart', JSON.stringify(cart));
+function showToast(msg, type = 'success') {
+  toast.textContent = msg;
+  toast.className = 'toast show' + (type !== 'success' ? ' ' + type : '');
+  setTimeout(() => toast.classList.remove('show'), 2600);
+}
+const openCart = () => { cartDrawer.classList.add('open'); overlay.classList.add('show'); };
+const closeCart = () => { cartDrawer.classList.remove('open'); overlay.classList.remove('show'); };
+
+function renderCart() {
+  if (cart.length === 0) {
+    cartItems.innerHTML = `<p class="cart-empty">${translations[currentLang].cart_empty}</p>`;
+    pickupSection.style.display = 'none';
+  } else {
+    cartItems.innerHTML = cart.map((item, idx) => `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <strong>${item.name}</strong>
+          <span>₱${item.price} each</span>
+        </div>
+        <div class="qty-controls">
+          <button class="qty-btn" data-action="dec" data-idx="${idx}">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" data-action="inc" data-idx="${idx}">+</button>
+        </div>
+        <button class="remove-btn" data-action="remove" data-idx="${idx}" aria-label="Remove">×</button>
+      </div>
+    `).join('');
+    pickupSection.style.display = 'block';
+  }
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  const totalPrice = cart.reduce((s, i) => s + i.qty * i.price, 0);
+  cartCount.textContent = totalQty;
+  cartCount.classList.toggle('show', totalQty > 0);
+  cartTotal.textContent = '₱' + totalPrice.toLocaleString();
+  updateLoyaltyUI();
+}
+function addToCart(name, price) {
+  const existing = cart.find(i => i.name === name);
+  if (existing) existing.qty++;
+  else cart.push({ name, price, qty: 1 });
+  saveCart();
+  renderCart();
+}
+document.querySelectorAll('.add-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.menu-item');
+    addToCart(card.dataset.name, Number(card.dataset.price));
+    btn.textContent = '✓';
+    btn.classList.add('added');
+    showToast(`${card.dataset.name} ${translations[currentLang].added_toast}`);
+    setTimeout(() => {
+      btn.textContent = translations[currentLang].add_btn;
+      btn.classList.remove('added');
+    }, 1200);
+  });
+});
+cartItems.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const idx = Number(btn.dataset.idx);
+  if (isNaN(idx)) return;
+  if (action === 'inc') cart[idx].qty++;
+  else if (action === 'dec') { cart[idx].qty--; if (cart[idx].qty <= 0) cart.splice(idx, 1); }
+  else if (action === 'remove') cart.splice(idx, 1);
+  saveCart();
+  renderCart();
+});
+document.querySelectorAll('.pickup-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.pickup-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    pickupMode = opt.dataset.mode;
+    if (pickupMode === 'asap') {
+      pickupMinutes = parseInt(opt.dataset.minutes || 15, 10);
+      preorderBox.style.display = 'none';
+    } else {
+      preorderBox.style.display = 'block';
+      if (!preorderInput.value) {
+        const d = new Date(Date.now() + 2 * 60 * 60 * 1000);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        preorderInput.value = d.toISOString().slice(0, 16);
+      }
+    }
+  });
+});
+cartBtn.addEventListener('click', openCart);
+cartClose.addEventListener('click', closeCart);
+overlay.addEventListener('click', closeCart);
+document.querySelectorAll('.qr-card').forEach(card => {
+  card.addEventListener('click', () => {
+    showToast(`${card.dataset.method} — ${translations[currentLang].scan_qr}`, 'info');
+  });
+});
+
+/* ============ CONFIRMATION ============ */
+const confirmModal = document.getElementById('confirmModal');
+const orderSummary = document.getElementById('orderSummary');
+let lastOrderSnapshot = null;
+let lastOrderNo = '';
+let lastPickupText = '';
+
+function formatPickup() {
+  if (pickupMode === 'scheduled' && preorderInput.value) {
+    const d = new Date(preorderInput.value);
+    return d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + pickupMinutes);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (ASAP)';
+}
+function showConfirmModal(orderSnapshot, stampsEarned) {
+  const subtotal = orderSnapshot.reduce((s, i) => s + i.qty * i.price, 0);
+  const pickupTime = formatPickup();
+  lastPickupText = pickupTime;
+  orderSummary.innerHTML = `
+    <div class="pickup-note"><span>${translations[currentLang].pickup_label}:</span><strong>${pickupTime}</strong></div>
+    ${paymentScreenshot ? `<div class="pickup-note"><span>Payment:</span><strong>📸 Screenshot</strong></div>` : ''}
+    <h4>${translations[currentLang].order_details}</h4>
+    ${orderSnapshot.map(i => `
+      <div class="summary-line"><span>${i.qty} × ${i.name}</span><span>₱${(i.qty * i.price).toLocaleString()}</span></div>
+    `).join('')}
+    <div class="summary-line total"><span>${translations[currentLang].cart_total}</span><span>₱${subtotal.toLocaleString()}</span></div>
+  `;
+  if (stampsEarned > 0) {
+    document.getElementById('loyaltyEarned').style.display = 'flex';
+    document.getElementById('stampsEarned').textContent = '+' + stampsEarned;
+    const l = getLoyalty();
+    document.getElementById('loyaltyNewCount').textContent = `${l.stamps}/${LOYALTY_TARGET}${l.rewards > 0 ? ' · 🎁 ' + l.rewards : ''}`;
+  } else {
+    document.getElementById('loyaltyEarned').style.display = 'none';
+  }
+  confirmModal.classList.add('active');
+  lastOrderSnapshot = orderSnapshot;
+}
+const closeConfirm = () => confirmModal.classList.remove('active');
+document.getElementById('confirmClose').addEventListener('click', closeConfirm);
+document.getElementById('confirmDone').addEventListener('click', closeConfirm);
+confirmModal.addEventListener('click', e => { if (e.target === confirmModal) closeConfirm(); });
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  if (!lastOrderSnapshot) return;
+  const subtotal = lastOrderSnapshot.reduce((s, i) => s + i.qty * i.price, 0);
+  document.getElementById('rDate').textContent = new Date().toLocaleString();
+  document.getElementById('rOrderNo').textContent = 'Order #' + lastOrderNo;
+  document.getElementById('rItems').innerHTML = lastOrderSnapshot.map(i => `
+    <div class="r-item"><span>${i.qty} × ${i.name}</span><span>₱${(i.qty * i.price).toLocaleString()}</span></div>
+  `).join('');
+  document.getElementById('rTotal').textContent = '₱' + subtotal.toLocaleString();
+  document.getElementById('rPickup').textContent = lastPickupText;
+  window.print();
+});
+
+/* ============ CHECKOUT ============ */
+checkoutBtn.addEventListener('click', () => {
+  if (cart.length === 0) { showToast(translations[currentLang].cart_empty_toast, 'error'); return; }
+  const orderSnapshot = JSON.parse(JSON.stringify(cart));
+  const subtotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
+  const pickupTime = formatPickup();
+  const orderNo = Math.floor(1000 + Math.random() * 9000);
+  lastOrderNo = orderNo;
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  addLoyaltyStamps(totalQty);
+  const lines = cart.map(i => `• ${i.qty} × ${i.name}  —  ₱${(i.qty * i.price).toLocaleString()}`);
+  const orderId = 'RVY-' + Date.now().toString().slice(-8);
+  const orderRecord = {
+    id: orderId, orderNo, timestamp: new Date().toISOString(),
+    items: orderSnapshot, subtotal, pickup: pickupTime, pickupMode,
+    hasPayment: !!paymentScreenshot,
+    paymentMethod: paymentScreenshot ? 'GCash/Maya' : 'Cash',
+    stampsEarned: totalQty, customer: 'Walk-in (web)',
+  };
+  const history = JSON.parse(localStorage.getItem('roveyahh-orders') || '[]');
+  history.unshift(orderRecord);
+  localStorage.setItem('roveyahh-orders', JSON.stringify(history.slice(0, 200)));
+
+  const subject = `Order #${orderNo} from Roveyahh's Website`;
+  const body = `Hi Roveyahh's Coffee Shop,\n\nI'd like to place the following order:\n\n${lines.join('\n')}\n\n──────────────────\nSubtotal:  ₱${subtotal.toLocaleString()}\nPickup:    ${pickupTime}\nOrder #:   ${orderNo}\nOrder ID:  ${orderId}\nPayment:   ${paymentScreenshot ? 'Screenshot attached' : 'Cash on pickup'}\n\nPlease confirm my order.\n\nThank you!`;
+  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1' +
+    '&to=' + encodeURIComponent('roveyahh@gmail.com') +
+    '&su=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  window.open(gmailUrl, '_blank');
+  sendOrderNotification(orderNo, subtotal, pickupTime);
+  showConfirmModal(orderSnapshot, totalQty);
+  showToast(translations[currentLang].opening_gmail, 'info');
+  cart = [];
+  saveCart();
+  renderCart();
+  closeCart();
+  paymentScreenshot = null;
+  document.getElementById('screenshotPreview').classList.remove('show');
+});
+
+/* ============ NOTIFICATIONS ============ */
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+async function sendOrderNotification(orderNo, total, pickup) {
+  const granted = await requestNotificationPermission();
+  if (!granted) return;
+  const title = `☕ Order #${orderNo} Confirmed!`;
+  const body = `Your order of ₱${total.toLocaleString()} is being prepared. Pickup at ${pickup}.`;
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification(title, { body, tag: 'roveyahh-order' });
+    } else {
+      new Notification(title, { body });
+    }
+  } catch (e) {
+    new Notification(title, { body });
+  }
+}
+
+/* ============ RESERVATION ============ */
+document.getElementById('reservationForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const guests = document.getElementById('guests').value;
+  const phone = document.getElementById('phone').value.trim();
+  const notes = document.getElementById('notes').value.trim() || '—';
+  const subject = `Table Reservation – ${name} (${date} ${time})`;
+  const body = `Hi Roveyahh's Coffee Shop,\n\nI'd like to reserve a table. Here are my details:\n\n• Name:     ${name}\n• Date:     ${date}\n• Time:     ${time}\n• Guests:   ${guests}\n• Phone:    ${phone}\n• Notes:    ${notes}\n\nPlease confirm my reservation. Thank you!`;
+  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1' +
+    '&to=' + encodeURIComponent('roveyahh@gmail.com') +
+    '&su=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  window.open(gmailUrl, '_blank');
+  showToast(`${name} — Email ready! Click Send ☕`, 'info');
+  this.reset();
+});
+const dateInput = document.getElementById('date');
+const todayISO = new Date().toISOString().split('T')[0];
+dateInput.min = todayISO;
+dateInput.value = todayISO;
+
+/* ============ ADMIN PANEL ============ */
+const adminModal = document.getElementById('adminModal');
+const openAdmin = () => { renderAdmin(); adminModal.classList.add('active'); document.body.style.overflow = 'hidden'; };
+const closeAdmin = () => { adminModal.classList.remove('active'); document.body.style.overflow = ''; };
+document.getElementById('adminBtn').addEventListener('click', openAdmin);
+adminModal.addEventListener('click', e => { if (e.target === adminModal) closeAdmin(); });
+
+function renderAdmin() {
+  const orders = JSON.parse(localStorage.getItem('roveyahh-orders') || '[]');
+  const body = document.getElementById('ordersBody');
+  const label = document.getElementById('orderCountLabel');
+  const totalRevenue = orders.reduce((s, o) => s + (o.subtotal || 0), 0);
+  const isToday = iso => new Date(iso).toDateString() === new Date().toDateString();
+  const todayOrders = orders.filter(o => isToday(o.timestamp));
+  const todayRevenue = todayOrders.reduce((s, o) => s + (o.subtotal || 0), 0);
+  const totalItems = orders.reduce((s, o) => s + o.items.reduce((si, i) => si + i.qty, 0), 0);
+  const itemCount = {};
+  orders.forEach(o => o.items.forEach(i => { itemCount[i.name] = (itemCount[i.name] || 0) + i.qty; }));
+  const sorted = Object.entries(itemCount).sort((a, b) => b[1] - a[1]);
+  const top = sorted[0];
+  document.getElementById('statOrders').textContent = orders.length;
+  document.getElementById('statOrdersToday').textContent = `${todayOrders.length} today`;
+  document.getElementById('statRevenue').textContent = '₱' + totalRevenue.toLocaleString();
+  document.getElementById('statRevenueToday').textContent = '₱' + todayRevenue.toLocaleString() + ' today';
+  document.getElementById('statItems').textContent = totalItems;
+  document.getElementById('statTop').textContent = top ? top[0] : '—';
+  document.getElementById('statTopCount').textContent = top ? `${top[1]} sold` : '—';
+  label.textContent = `${orders.length} order${orders.length !== 1 ? 's' : ''}`;
+
+  if (orders.length === 0) {
+    body.innerHTML = '<tr><td colspan="7" class="admin-empty">No orders yet ☕</td></tr>';
+    return;
+  }
+  body.innerHTML = orders.map((o, idx) => {
+    const itemCount2 = o.items.reduce((s, i) => s + i.qty, 0);
+    const itemSummary = o.items.map(i => `${i.qty}× ${i.name}`).slice(0, 2).join(', ') + (o.items.length > 2 ? ` +${o.items.length - 2}` : '');
+    const paymentPill = o.hasPayment ? `<span class="pill paid">📸 ${o.paymentMethod}</span>` : `<span class="pill cash">💵 Cash</span>`;
+    return `
+      <tr>
+        <td class="id">#${o.orderNo}</td>
+        <td>${new Date(o.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+        <td>${itemSummary} <span style="color:#8a7563">(${itemCount2})</span></td>
+        <td>${o.pickup || '—'}</td>
+        <td>${paymentPill}</td>
+        <td class="total">₱${(o.subtotal || 0).toLocaleString()}</td>
+        <td><button class="expand-btn" onclick="toggleRow(${idx})">View</button></td>
+      </tr>
+      <tr class="row-expand" id="expand-${idx}">
+        <td colspan="7">
+          ${o.items.map(i => `<div class="item-line"><span>${i.qty} × ${i.name}</span><span>₱${(i.qty * i.price).toLocaleString()}</span></div>`).join('')}
+          <div class="item-line" style="border-top:1px dashed rgba(212,163,115,0.3); margin-top:0.5rem; padding-top:0.5rem; font-weight:bold;">
+            <span>Total</span><span>₱${(o.subtotal || 0).toLocaleString()}</span>
+          </div>
+          <div style="margin-top:0.75rem; font-size:0.75rem; color:#8a7563;">Order ID: ${o.id} · Stamps earned: ${o.stampsEarned || 0}</div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+function toggleRow(idx) {
+  document.getElementById(`expand-${idx}`)?.classList.toggle('show');
+}
+function clearOrders() {
+  if (!confirm('Delete ALL order history? This cannot be undone.')) return;
+  localStorage.removeItem('roveyahh-orders');
+  renderAdmin();
+}
+setInterval(() => {
+  if (adminModal.classList.contains('active')) renderAdmin();
+}, 15000);
+
+/* ============ TRANSLATIONS ============ */
+const translations = {
+  en: {
+    nav_menu: "Menu", nav_gallery: "Gallery", nav_about: "About", nav_hours: "Hours", nav_visit: "Visit",
+    hero_title_html: `Welcome to <span>Roveyahh's</span><br>Coffee Shop`,
+    hero_sub: "Freshly roasted, lovingly brewed. Your cozy corner in Downtown Davao City for small-batch coffee and warm pastries.",
+    hero_btn: "Explore Our Menu",
+    menu_title: "Our Menu", menu_sub: "Crafted with care, served with love",
+    search_placeholder: "Search the menu...", no_results: "No items match your search ☕",
+    ordered: "ordered", best_seller: "Best Seller",
+    item_espresso: "Roveyahh's Signature Espresso", item_espresso_desc: "Rich, velvety double shot pulled from our house blend.",
+    item_latte: "Vanilla Latte", item_latte_desc: "Smooth espresso, steamed milk, and a hint of Madagascar vanilla.",
+    item_coldbrew: "Cold Brew", item_coldbrew_desc: "Steeped 18 hours for a smooth, bold, low-acid taste.",
+    item_croissant: "Butter Croissant", item_croissant_desc: "Flaky, golden, baked fresh every morning at 6 AM.",
+    item_tiramisu: "Tiramisu Slice", item_tiramisu_desc: "Espresso-soaked ladyfingers with mascarpone cream.",
+    item_matcha: "Matcha Latte", item_matcha_desc: "Ceremonial-grade matcha whisked with oat milk.",
+    add_btn: "+ Add", added_toast: "added to cart ☕",
+    gallery_title: "From Our Shop", gallery_sub: "A peek inside Roveyahh's",
+    about_title: "Our Story",
+    about_p1: "Founded in 2015, Roveyahh's Coffee Shop started as a tiny cart on the corner of 5th and Main. We believed that great coffee shouldn't be complicated — just honest beans, roasted with patience, and served with a smile.",
+    about_p2: "Today we source directly from family farms in Ethiopia, Colombia, and Guatemala, roasting every batch in-house to bring out the best in every cup.",
+    stat_cups: "Cups / Month", stat_farms: "Origin Farms", stat_years: "Roasting",
+    hours_title: "Opening Hours", hours_sub: "Come say hi at Roveyahh's",
+    hours_open_now: "☕ We're open right now — come on in!",
+    hours_closed_now: "😴 We're currently closed. See you soon!",
+    day_mon: "Monday", day_tue: "Tuesday", day_wed: "Wednesday", day_thu: "Thursday", day_fri: "Friday", day_sat: "Saturday", day_sun: "Sunday",
+    visit_title: "Visit Us", visit_sub: "Find us in Downtown Davao City — or book a table below",
+    find_us: "📍 Find Us", contact_hours: "🕒 Open daily from 7:00 AM",
+    reserve_title: "📅 Reserve a Table", reserve_sub: "We'll confirm your booking within 1 hour",
+    form_name: "Your Name", form_name_ph: "e.g. Juan Dela Cruz",
+    form_date: "Date", form_time: "Time", form_guests: "Guests", form_phone: "Phone",
+    form_notes: "Special Requests (optional)", form_notes_ph: "Window seat, birthday cake, etc.",
+    form_submit: "Reserve Now ☕",
+    status_open: "Open Now", status_closed: "Closed Now", status_closes_in: "closes in",
+    cart_title: "Your Order", cart_empty: "Your cart is empty ☕",
+    cart_empty_toast: "Your cart is empty — add something first! ☕",
+    cart_total: "Total", cart_checkout: "Order via Email ✉️",
+    pickup_title: "When would you like it?", pickup_asap: "ASAP", pickup_schedule: "Schedule",
+    pickup_label: "Pickup",
+    pay_title: "Pay via", scan_qr: "Scan QR to pay",
+    upload_receipt: "📸 Upload Payment Screenshot", take_photo: "Take Photo", from_gallery: "From Gallery",
+    order_details: "Order Details",
+    confirm_title: "Order Received!",
+    confirm_sub: "Your order has been sent to our Gmail. We'll confirm your pickup time shortly.",
+    confirm_new: "New Order", confirm_done: "Done", btn_print: "🖨️ Print",
+    opening_gmail: "Opening Gmail — just hit Send! ✉️",
+    loyalty_chip: "Loyalty", loyalty_title: "⭐ Loyalty Card",
+    stamps_label: "stamps", free_drink: "free drink", free_drinks_earned: "Free drinks earned",
+    loyalty_earned: "Loyalty stamps:", loyalty_modal_title: "Your Loyalty Card",
+    loyalty_modal_sub: "Buy 9 drinks, get the 10th free!",
+  },
+  fil: {
+    nav_menu: "Menu", nav_gallery: "Gallery", nav_about: "Tungkol", nav_hours: "Oras", nav_visit: "Bisitahin",
+    hero_title_html: `Maligayang Pagdating sa <span>Roveyahh's</span><br>Coffee Shop`,
+    hero_sub: "Sariwang inihaw, buong pusong tinimpla. Ang inyong maliit na sulok sa Downtown Davao City para sa small-batch na kape at mainit na pastries.",
+    hero_btn: "Tingnan ang Menu", menu_title: "Aming Menu", menu_sub: "Ginawa nang may pagmamahal",
+    search_placeholder: "Maghanap sa menu...", no_results: "Walang tumugma ☕",
+    ordered: "na-order", best_seller: "Pinaka-benta",
+    item_espresso: "Signature Espresso ni Roveyahh", item_espresso_desc: "Malinamnam at malambot na double shot mula sa aming house blend.",
+    item_latte: "Vanilla Latte", item_latte_desc: "Makinis na espresso, steamed milk, at bahagyang Madagascar vanilla.",
+    item_coldbrew: "Cold Brew", item_coldbrew_desc: "Binabad ng 18 oras para sa makinis at malakas na lasa.",
+    item_croissant: "Butter Croissant", item_croissant_desc: "Malutong at gintong croissant, sariwang lutong tuwing 6 AM.",
+    item_tiramisu: "Tiramisu Slice", item_tiramisu_desc: "Ladyfingers na binabad sa espresso at mascarpone cream.",
+    item_matcha: "Matcha Latte", item_matcha_desc: "Ceremonial-grade matcha hinalo sa oat milk.",
+    add_btn: "+ Idagdag", added_toast: "naidagdag sa cart ☕",
+    gallery_title: "Mula sa Aming Tindahan", gallery_sub: "Silipin ang loob ng Roveyahh's",
+    about_title: "Aming Kwento",
+    about_p1: "Itinatag noong 2015, nagsimula ang Roveyahh's Coffee Shop bilang maliit na cart sa sulok ng 5th at Main. Naniniwala kami na ang masarap na kape ay hindi kailangang komplikado.",
+    about_p2: "Ngayon, diretso kaming kumukuha mula sa pamilyang bukid sa Ethiopia, Colombia, at Guatemala.",
+    stat_cups: "Tasa / Buwan", stat_farms: "Pinagmulang Bukid", stat_years: "Taon ng Pag-ihaw",
+    hours_title: "Oras ng Pagbubukas", hours_sub: "Bisitahin kami sa Roveyahh's",
+    hours_open_now: "☕ Bukas kami ngayon — halina!", hours_closed_now: "😴 Sarado kami ngayon.",
+    day_mon: "Lunes", day_tue: "Martes", day_wed: "Miyerkules", day_thu: "Huwebes", day_fri: "Biyernes", day_sat: "Sabado", day_sun: "Linggo",
+    visit_title: "Bisitahin Kami", visit_sub: "Hanapin kami sa Downtown Davao City",
+    find_us: "📍 Hanapin Kami", contact_hours: "🕒 Bukas araw-araw mula 7:00 AM",
+    reserve_title: "📅 Mag-reserve ng Table", reserve_sub: "Kukumpirmahin namin sa loob ng 1 oras",
+    form_name: "Iyong Pangalan", form_name_ph: "hal. Juan Dela Cruz",
+    form_date: "Petsa", form_time: "Oras", form_guests: "Mga Bisita", form_phone: "Telepono",
+    form_notes: "Espesyal na Kahilingan", form_notes_ph: "Tabing bintana, birthday cake, atbp.",
+    form_submit: "Mag-reserve Na ☕",
+    status_open: "Bukas Ngayon", status_closed: "Sarado Ngayon", status_closes_in: "magsasara sa",
+    cart_title: "Iyong Order", cart_empty: "Walang laman ang cart ☕",
+    cart_empty_toast: "Walang laman — magdagdag muna! ☕",
+    cart_total: "Kabuuan", cart_checkout: "I-order sa Email ✉️",
+    pickup_title: "Kailan mo gusto?", pickup_asap: "Agad", pickup_schedule: "I-schedule",
+    pickup_label: "Pickup", pay_title: "Magbayad sa", scan_qr: "I-scan ang QR",
+    upload_receipt: "📸 I-upload ang Screenshot", take_photo: "Kunan ng Litrato", from_gallery: "Mula sa Gallery",
+    order_details: "Detalye ng Order",
+    confirm_title: "Natanggap ang Order!", confirm_sub: "Naipadala sa Gmail. Kukumpirmahin namin.",
+    confirm_new: "Bagong Order", confirm_done: "Tapos", btn_print: "🖨️ I-print",
+    opening_gmail: "Binubuksan ang Gmail ✉️",
+    loyalty_chip: "Loyalty", loyalty_title: "⭐ Loyalty Card",
+    stamps_label: "stamps", free_drink: "libreng inumin", free_drinks_earned: "Mga libreng inumin",
+    loyalty_earned: "Mga stamp:", loyalty_modal_title: "Iyong Loyalty Card",
+    loyalty_modal_sub: "Bumili ng 9, libre ang ika-10!",
+  },
+  ceb: {
+    nav_menu: "Menu", nav_gallery: "Gallery", nav_about: "Mahitungod", nav_hours: "Oras", nav_visit: "Bisitaha",
+    hero_title_html: `Maayong Pag-abot sa <span>Roveyahh's</span><br>Coffee Shop`,
+    hero_sub: "Bag-ong sinangag, gihigugma nga gisimhot. Ang inyong suok sa Downtown Davao City.",
+    hero_btn: "Tan-awa ang Menu", menu_title: "Among Menu", menu_sub: "Gihimo uban sa pag-atiman",
+    search_placeholder: "Pangitaa...", no_results: "Walay nakit-an ☕",
+    ordered: "na-order", best_seller: "Pinakabaligya",
+    item_espresso: "Signature Espresso ni Roveyahh", item_espresso_desc: "Lamian nga double shot gikan sa among house blend.",
+    item_latte: "Vanilla Latte", item_latte_desc: "Hapsay nga espresso, steamed milk, ug Madagascar vanilla.",
+    item_coldbrew: "Cold Brew", item_coldbrew_desc: "Gibutang sa 18 ka oras alang sa hapsay nga lami.",
+    item_croissant: "Butter Croissant", item_croissant_desc: "Bag-ong luto matag 6 AM.",
+    item_tiramisu: "Tiramisu Slice", item_tiramisu_desc: "Ladyfingers nga gibutang sa espresso.",
+    item_matcha: "Matcha Latte", item_matcha_desc: "Ceremonial-grade matcha gisagol sa oat milk.",
+    add_btn: "+ Idugang", added_toast: "gidugang sa cart ☕",
+    gallery_title: "Gikan sa Among Tindahan", gallery_sub: "Sil-ip sa sulod",
+    about_title: "Among Sugilanon",
+    about_p1: "Natukod niadtong 2015, nagsugod ang Roveyahh's isip gamay nga cart.",
+    about_p2: "Karon nagkuha kami diretso gikan sa pamilya nga uma sa Ethiopia, Colombia, ug Guatemala.",
+    stat_cups: "Tasa / Bulan", stat_farms: "Gigikanan nga Uma", stat_years: "Katuigan",
+    hours_title: "Oras sa Pag-abli", hours_sub: "Bisitaha kami",
+    hours_open_now: "☕ Abli kami karon!", hours_closed_now: "😴 Sirado kami karon.",
+    day_mon: "Lunes", day_tue: "Martes", day_wed: "Miyerkules", day_thu: "Huwebes", day_fri: "Biyernes", day_sat: "Sabado", day_sun: "Dominggo",
+    visit_title: "Bisitaha Kami", visit_sub: "Pangitaa kami sa Downtown Davao City",
+    find_us: "📍 Pangitaa Kami", contact_hours: "🕒 Abli kada adlaw gikan 7:00 AM",
+    reserve_title: "📅 Mag-reserve", reserve_sub: "Kumpirmahon sulod sa 1 ka oras",
+    form_name: "Imong Ngalan", form_name_ph: "pananglitan Juan",
+    form_date: "Petsa", form_time: "Oras", form_guests: "Mga Bisita", form_phone: "Telepono",
+    form_notes: "Espesyal nga Hangyo", form_notes_ph: "Daplin sa bintana, atbp.",
+    form_submit: "Mag-reserve Na ☕",
+    status_open: "Abli Karon", status_closed: "Sirado Karon", status_closes_in: "magsira sa",
+    cart_title: "Imong Order", cart_empty: "Walay sulod ☕",
+    cart_empty_toast: "Walay sulod — pagdugang una! ☕",
+    cart_total: "Kinatibuk-an", cart_checkout: "I-order pinaagi sa Email ✉️",
+    pickup_title: "Kanus-a nimo gusto?", pickup_asap: "Dali", pickup_schedule: "I-schedule",
+    pickup_label: "Pickup", pay_title: "Magbayad pinaagi sa", scan_qr: "I-scan ang QR",
+    upload_receipt: "📸 I-upload ang Screenshot", take_photo: "Pagkuha og Litrato", from_gallery: "Gikan sa Gallery",
+    order_details: "Detalye sa Order",
+    confirm_title: "Nadawat ang Order!", confirm_sub: "Gipadala sa Gmail. Kumpirmahon namo.",
+    confirm_new: "Bag-ong Order", confirm_done: "Human", btn_print: "🖨️ I-print",
+    opening_gmail: "Giablihan ang Gmail ✉️",
+    loyalty_chip: "Loyalty", loyalty_title: "⭐ Loyalty Card",
+    stamps_label: "stamps", free_drink: "libre nga ilimnon", free_drinks_earned: "Mga libre nga ilimnon",
+    loyalty_earned: "Mga stamp:", loyalty_modal_title: "Imong Loyalty Card",
+    loyalty_modal_sub: "Pagpalit og 9, libre ang ika-10!",
+  }
+};
+
+/* ============ LANGUAGE ============ */
+let currentLang = localStorage.getItem('roveyahh-lang');
+if (!currentLang) {
+  const browser = (navigator.language || 'en').toLowerCase();
+  if (browser.startsWith('fil') || browser.startsWith('tl')) currentLang = 'fil';
+  else if (browser.startsWith('ceb')) currentLang = 'ceb';
+  else currentLang = 'en';
+  localStorage.setItem('roveyahh-lang', currentLang);
+}
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('roveyahh-lang', lang);
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (translations[lang][key] !== undefined) {
+      if (key === 'hero_title_html') el.innerHTML = translations[lang][key];
+      else el.textContent = translations[lang][key];
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (translations[lang][key]) el.placeholder = translations[lang][key];
+  });
+  document.querySelectorAll('.lang-switch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  renderStatus();
+  renderCart();
+  filterMenu();
+  updateLoyaltyUI();
+}
+document.querySelectorAll('.lang-switch button').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+applyLang(currentLang);
+
+/* ============ INITIAL ============ */
+renderCart();
+updateLoyaltyStatus = updateLoyaltyUI;
+updateLoyaltyUI();
+setInterval(renderStatus, 60000);
+</script>
+
+</body>
+</html>
