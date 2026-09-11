@@ -1,0 +1,2 @@
+# roveyahhs-coffee-shop
+☕ Roveyahh's Coffee Shop — A cozy, full-featured coffee shop website built with pure HTML, CSS, and JavaScript. Features live menu, cart, loyalty rewards, GCash/Maya QR payments, pre-orders, reservations, order notifications, and a built-in admin panel. Based in Downtown Davao City.
